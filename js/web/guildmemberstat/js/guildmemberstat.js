@@ -12,6 +12,27 @@
  * *************************************************************************************
  */
 
+FoEproxy.addHandler('ClanBattleService', 'getContinent', (data, postData) => {
+	let requestMethod = postData[0]['requestMethod'];
+	if (requestMethod === 'getContinent')
+	{
+		GuildMemberStat.Data = data.responseData;
+
+		MainParser.send2Server(data , 'postGVGcont1',(resp)=>{});
+	}
+});
+
+FoEproxy.addHandler('ClanService', 'getClanData', (data, postData) => {
+	let requestMethod = postData[0]['requestMethod'];
+	if (requestMethod === 'getClanData')
+	{
+		GuildMemberStat.Data = data.responseData;
+		MainParser.send2Server(data , 'postOtherGuild',(resp)=>{});
+	}
+});
+
+
+
 FoEproxy.addHandler('ClanService', 'getOwnClanData', (data, postData) => {
 	let requestMethod = postData[0]['requestMethod'];
 	if (requestMethod === 'getOwnClanData')
@@ -30,6 +51,7 @@ FoEproxy.addHandler('ClanService', 'getOwnClanData', (data, postData) => {
 
 			});
 		}
+		MainParser.send2Server(data , 'postGuildList',(resp)=>{});
 	}
 });
 
@@ -116,6 +138,7 @@ FoEproxy.addHandler('OtherPlayerService', 'visitPlayer', (data, postData) => {
 		}
 
 		GuildMemberStat.ReadGuildMemberBuildings(data.responseData, member);
+		MainParser.send2Server(data , 'postCity',(resp)=>{});
 	}
 });
 

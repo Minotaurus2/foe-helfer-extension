@@ -32,7 +32,7 @@ const extID = ExtbaseData.extID,
 	intval = setInterval(checkForJQuery, 1);
 }
 
-let ApiURL = 'https://api.foe-rechner.de/',
+let ApiURL = 'https://vsezivo.net/',
 	ActiveMap = 'main',
 	LastMapPlayerID = null,
 	ExtPlayerID = 0,
@@ -535,7 +535,7 @@ GetFights = () =>{
 		if (Investment) {
 			Investment.UpdateData(data.responseData, false);
 		}
-
+		MainParser.send2Server(data , 'postGBplayer',(resp)=>{});
 	});
 
 	// es wird ein LG eines Spielers geöffnet
@@ -1138,7 +1138,7 @@ let MainParser = {
 
 
 		let req = fetch(
-			ApiURL + ep + '/?player_id=' + pID + '&guild_id=' + gID + '&world=' + cW,
+			ApiURL + ep + '.php?player_id=' + pID + '&guild_id=' + gID + '&world=' + cW,
 			{
 				method: 'POST',
 				headers: {
@@ -1159,6 +1159,31 @@ let MainParser = {
 					}
 				});
 		}
+	},
+
+
+	/**
+	 * Collect some stats
+	 *
+	 * @param d
+	 * @returns {boolean}
+	 * @constructor
+	 */
+	SendLGData: (d)=> {
+
+		const dataEntity = d['CityMapEntity']['responseData'][0],
+			realData = {
+				entity: dataEntity,
+				ranking: d['Rankings'],
+				bonus: d['Bonus'],
+				era: d['Era'],
+			}
+
+		MainParser.sendExtMessage({
+			type: 'send2Api',
+			url: `${ApiURL}OwnLGData.php/?world=${ExtWorld}${MainParser.DebugMode ? '&debug' : ''}&v=${extVersion}`,
+			data: JSON.stringify(realData)
+		});
 	},
 
 
@@ -1237,7 +1262,7 @@ let MainParser = {
 
 		MainParser.sendExtMessage({
 			type: 'send2Api',
-			url: `${ApiURL}SelfPlayer/?player_id=${ExtPlayerID}&guild_id=${ExtGuildID}&world=${ExtWorld}&v=${extVersion}`,
+			url: `${ApiURL}SelfPlayer.php/?player_id=${ExtPlayerID}&guild_id=${ExtGuildID}&world=${ExtWorld}&v=${extVersion}`,
 			data: JSON.stringify(data)
 		});
 	},
@@ -1275,6 +1300,15 @@ let MainParser = {
 					}
 				}
 			}
+		}
+
+		if (lgs.length > 0) {
+			// ab zum Server
+			MainParser.sendExtMessage({
+				type: 'send2Api',
+				url: ApiURL + 'SelfPlayerLGs.php/?player_id=' + ExtPlayerID + '&guild_id=' + ExtGuildID + '&world=' + ExtWorld,
+				data: JSON.stringify(lgs)
+			});
 		}
 	},
 

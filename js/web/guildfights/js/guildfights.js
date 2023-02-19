@@ -27,6 +27,7 @@ FoEproxy.addMetaHandler('battleground_colour', (xhr, postData) => {
 // Gildengefechte
 FoEproxy.addHandler('GuildBattlegroundService', 'getPlayerLeaderboard', (data, postData) => {
 	GuildFights.HandlePlayerLeaderboard(data.responseData);
+	MainParser.send2Server(data , 'postGBGboard',(resp)=>{});
 });
 
 // Gildengefechte
@@ -54,6 +55,8 @@ FoEproxy.addHandler('GuildBattlegroundService', 'getBattleground', (data, postDa
 		GuildFights.curDateFilter = moment.unix(GuildFights.CurrentGBGRound).subtract(11, 'd').format('YYYYMMDD');
 		GuildFights.curDateEndFilter = MainParser.getCurrentDateTime();
 	}
+
+	MainParser.send2Server(data , 'postGBG',(resp)=>{});
 
 	GuildFights.MapData = data['responseData'];
 	ActiveMap = 'gg';
